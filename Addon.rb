@@ -1,4 +1,4 @@
- require 'pathname'
+require 'pathname'
 
 class Addon
 	attr_accessor :name, :remote_version, :url, :dependencies

@@ -1,4 +1,4 @@
- require 'pathname'
+require 'pathname'
 
 class WoWAce
   API_KEY = "?api-key=8bb80a603bcd39e65d95c137bef853696250c2de"
