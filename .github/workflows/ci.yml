@@ -1,0 +1,46 @@
+name: Offline checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Require existing Ruby and XML parser without installation
+        run: |
+          /usr/bin/ruby --version
+          /usr/bin/ruby -rrexml/document -e 'puts "Preinstalled REXML available"'
+      - name: Parse all tracked Ruby files without running the updater
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r -d '' source; do
+            /usr/bin/ruby -c "$source"
+            count=$((count + 1))
+          done < <(git ls-files -z -- '*.rb')
+          test "$count" -gt 0
+          echo "Parsed $count Ruby source files." >> "$GITHUB_STEP_SUMMARY"
+      - name: Test version records and XML parsing with synthetic fixtures
+        run: |
+          set -euo pipefail
+          /usr/bin/ruby -I . tests/offline_checks.rb | tee "$RUNNER_TEMP/wow-offline-tests.log"
+          tail -n 1 "$RUNNER_TEMP/wow-offline-tests.log" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Offline model/parser coverage only; updater startup, downloads, ZIP extraction and real addon directories are not exercised.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify tracked sources were preserved
+        run: git diff --exit-code
