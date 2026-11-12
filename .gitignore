@@ -1,0 +1,34 @@
+# Ruby and Bundler
+/.bundle/
+/vendor/bundle/
+*.gem
+.byebug_history
+.ruby-lsp/
+/coverage/
+/pkg/
+/rdoc/
+
+# Downloaded addon archives and logs
+*.zip
+*.log
+
+# OS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
